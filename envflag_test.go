@@ -3,6 +3,7 @@ package envflag
 import (
 	"flag"
 	"fmt"
+	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
 )
@@ -27,6 +28,32 @@ func TestErrBool(t *testing.T) {
 	}
 }
 
+func TestFlagNameToEnvName(t *testing.T) {
+	Convey("FlagNameToEnvName", t, func() {
+		Convey("Simple", func() {
+			So(flagNameToEnvName("foo"), ShouldEqual, "FOO")
+		})
+		Convey("WithDot", func() {
+			So(flagNameToEnvName("foo.bar"), ShouldEqual, "FOO_BAR")
+		})
+		Convey("WithDash", func() {
+			So(flagNameToEnvName("foo-bar"), ShouldEqual, "FOO_BAR")
+		})
+		Convey("WithDashDot", func() {
+			So(flagNameToEnvName("foo.bar-baz"), ShouldEqual, "FOO_BAR_BAZ")
+		})
+		Convey("MultiDot", func() {
+			So(flagNameToEnvName("foo.bar.baz"), ShouldEqual, "FOO_BAR_BAZ")
+		})
+		Convey("MixedCase", func() {
+			So(flagNameToEnvName("FooBarBaz"), ShouldEqual, "FOOBARBAZ")
+		})
+
+	})
+	if flagNameToEnvName("foo-bar") != "FOO_BAR" {
+		t.Error("Expected")
+	}
+}
 func boolTest(val string, expected bool, expectErr bool) error {
 	fs := setup(val)
 	b := fs.Bool(TESTKEY, !expected, "Test")

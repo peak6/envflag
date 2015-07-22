@@ -47,7 +47,7 @@ func Parse() {
 }
 
 func visitor(f *flag.Flag) error {
-	envVar := strings.ToUpper(f.Name)
+	envVar := flagNameToEnvName(f.Name)
 	envVal := os.Getenv(envVar)
 	if envVal != "" {
 		err := f.Value.Set(envVal)
@@ -56,4 +56,11 @@ func visitor(f *flag.Flag) error {
 		}
 	}
 	return nil
+}
+
+func flagNameToEnvName(fn string) string {
+	fn = strings.ToUpper(fn)
+	fn = strings.Replace(fn, "-", "_", -1)
+	fn = strings.Replace(fn, ".", "_", -1)
+	return fn
 }
